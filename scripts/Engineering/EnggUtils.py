@@ -978,3 +978,9 @@ def sum_spectra(parent, ws):
     alg.execute()
 
     return alg.getProperty("OutputWorkspace").value
+
+
+def write_table_row(ws_table, row, irow):
+    if irow > ws_table.rowCount() - 1:
+        ws_table.setRowCount(irow + 1)
+    [ws_table.setCell(irow, icol, row[icol]) for icol in range(0, len(row))]

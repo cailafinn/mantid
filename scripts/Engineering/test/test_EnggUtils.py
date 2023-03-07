@@ -227,6 +227,16 @@ INS  2 ICONS  18497.75    -29.68    -26.50"""
         mock_add_log.assert_has_calls(add_log_calls)
         mock_save_nxs.assert_called_once_with(InputWorkspace=ws_foc, Filename=focused_files[0][0], WorkspaceIndexList=[0])
 
+    def test_write_table_row(self):
+        table_ws = mock.MagicMock()
+        table_ws.rowCount.return_value = 3
+
+        self.model.write_table_row(table_ws, [1, 2], 3)
+
+        table_ws.setRowCount.assert_called_with(4)  # row added
+        table_ws.setCell.assert_any_call(3, 0, 1)
+        table_ws.setCell.assert_any_call(3, 1, 2)
+
 
 if __name__ == "__main__":
     unittest.main()
