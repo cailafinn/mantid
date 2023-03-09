@@ -11,6 +11,7 @@ from Engineering.EnggUtils import (
     _save_output_files,
     _load_run_and_convert_to_dSpacing,
     process_vanadium,
+    write_table_row,
 )
 
 enggutils_path = "Engineering.EnggUtils"
@@ -231,7 +232,7 @@ INS  2 ICONS  18497.75    -29.68    -26.50"""
         table_ws = mock.MagicMock()
         table_ws.rowCount.return_value = 3
 
-        self.model.write_table_row(table_ws, [1, 2], 3)
+        write_table_row(table_ws, [1, 2], 3)
 
         table_ws.setRowCount.assert_called_with(4)  # row added
         table_ws.setCell.assert_any_call(3, 0, 1)
