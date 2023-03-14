@@ -296,6 +296,9 @@ class GSAS2View(QtWidgets.QWidget, Ui_calib):
     def get_figure(self):
         return self.figure
 
+    def get_data_view(self):
+        return self.group_data_view
+
     # ========================
     # Limits and Range Markers
     # ========================

@@ -7,11 +7,15 @@
 
 from mantidqt.utils.observer_pattern import GenericObserverWithArgPassing
 
+from mantidqtinterfaces.Engineering.gui.engineering_diffraction.tabs.common.data_handling.data_widget import FittingDataWidget
+
 
 class GSAS2Presenter(object):
     def __init__(self, model, view, test=False):
         self.model = model
         self.view = view
+
+        self.data_widget = FittingDataWidget(self.view, self.view.get_data_view())
 
         self.rb_num = None
         self.instrument = "ENGINX"
