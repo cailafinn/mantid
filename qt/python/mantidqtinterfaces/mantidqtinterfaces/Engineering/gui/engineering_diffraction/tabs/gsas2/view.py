@@ -40,10 +40,7 @@ class GSAS2View(QtWidgets.QWidget, Ui_calib):
         self.phase_file_finder.setFileExtensions([".cif"])
         self.phase_file_finder.allowMultipleFiles(True)
 
-        self.focused_data_file_finder.setLabelText("Focused Data")
-        self.focused_data_file_finder.isForRunFiles(False)
-        self.focused_data_file_finder.setFileExtensions([".gss", ".gsa"])
-        self.focused_data_file_finder.allowMultipleFiles(True)
+        # TODO: do we need this?: self.focused_data_file_finder.setFileExtensions([".gss", ".gsa"])
 
         self.mark_project_name_invalid_when_empty()
         self.project_name_line_edit.textChanged.connect(self.mark_project_name_invalid_when_empty)
@@ -97,7 +94,8 @@ class GSAS2View(QtWidgets.QWidget, Ui_calib):
     # =================
 
     def set_default_gss_files(self, filepaths):
-        self.set_default_files(filepaths, self.focused_data_file_finder)
+        pass
+        # self.set_default_files(filepaths, self.focused_data_file_finder)
 
     def set_default_prm_files(self, filepath):
         self.set_default_files([filepath], self.instrument_group_file_finder)
@@ -157,7 +155,7 @@ class GSAS2View(QtWidgets.QWidget, Ui_calib):
         return [
             self.instrument_group_file_finder.getFilenames(),
             self.phase_file_finder.getFilenames(),
-            self.focused_data_file_finder.getFilenames(),
+            # self.focused_data_file_finder.getFilenames(),
         ]
 
     def get_project_name(self):
@@ -174,7 +172,7 @@ class GSAS2View(QtWidgets.QWidget, Ui_calib):
     def find_files_load_parameters(self):
         self.instrument_group_file_finder.findFiles(True)
         self.phase_file_finder.findFiles(True)
-        self.focused_data_file_finder.findFiles(True)
+        # self.focused_data_file_finder.findFiles(True)
 
     # =================
     # Plot Window Setup
