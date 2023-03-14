@@ -91,7 +91,7 @@ QGroupBox:title {
             <string notr="true"/>
            </property>
            <property name="title">
-            <string>Load Focused Data</string>
+            <string>Setup</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignBottom|Qt::AlignHCenter</set>

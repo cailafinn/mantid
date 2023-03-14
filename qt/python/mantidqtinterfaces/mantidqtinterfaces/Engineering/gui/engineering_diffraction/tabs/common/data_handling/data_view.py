@@ -6,6 +6,7 @@
 # SPDX - License - Identifier: GPL - 3.0 +
 from qtpy import QtWidgets, QtCore, QtGui
 from os import path
+from typing import Sequence
 
 from mantidqt.utils.qt import load_ui
 from mantidqtinterfaces.Engineering.gui.engineering_diffraction.tabs.common import output_settings
@@ -168,6 +169,9 @@ class FittingDataView(QtWidgets.QWidget, Ui_data):
         else:
             SG_check_box.setCheckState(QtCore.Qt.Unchecked)
         self.table_selection.setItem(row_no, 6, SG_check_box)
+
+    def set_allowed_file_extensions(self, allowed_extensions: Sequence[str]) -> None:
+        self.finder_data.setFileExtensions(allowed_extensions)
 
     def remove_table_row(self, row_no):
         self.table_selection.removeRow(row_no)

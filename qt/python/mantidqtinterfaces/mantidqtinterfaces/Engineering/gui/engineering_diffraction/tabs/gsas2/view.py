@@ -40,7 +40,7 @@ class GSAS2View(QtWidgets.QWidget, Ui_calib):
         self.phase_file_finder.setFileExtensions([".cif"])
         self.phase_file_finder.allowMultipleFiles(True)
 
-        # TODO: do we need this?: self.focused_data_file_finder.setFileExtensions([".gss", ".gsa"])
+        self.group_data_view.set_allowed_file_extensions([".gss", ".gsa"])
 
         self.mark_project_name_invalid_when_empty()
         self.project_name_line_edit.textChanged.connect(self.mark_project_name_invalid_when_empty)
@@ -94,8 +94,7 @@ class GSAS2View(QtWidgets.QWidget, Ui_calib):
     # =================
 
     def set_default_gss_files(self, filepaths):
-        pass
-        # self.set_default_files(filepaths, self.focused_data_file_finder)
+        self.group_data_view.set_default_files(filepaths, self.focused_data_file_finder)
 
     def set_default_prm_files(self, filepath):
         self.set_default_files([filepath], self.instrument_group_file_finder)
@@ -155,7 +154,7 @@ class GSAS2View(QtWidgets.QWidget, Ui_calib):
         return [
             self.instrument_group_file_finder.getFilenames(),
             self.phase_file_finder.getFilenames(),
-            # self.focused_data_file_finder.getFilenames(),
+            self.group_data_view.get_filenames_to_load(),
         ]
 
     def get_project_name(self):
