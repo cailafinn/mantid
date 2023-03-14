@@ -397,7 +397,10 @@ class FittingDataModel(object):
     def get_all_workspace_names(self):
         return self._data_workspaces.get_loaded_workpace_names() + self._data_workspaces.get_bgsub_workpace_names()
 
-    def get_log_workspaces_name(self):
+    def get_all_log_workspaces_names(self):
+        return [ws.name() for ws in self._log_workspaces] if self._log_workspaces else []
+
+    def get_log_workspace_group_name(self):
         return self._log_workspaces.name()
 
     def get_bgsub_workspaces(self):
