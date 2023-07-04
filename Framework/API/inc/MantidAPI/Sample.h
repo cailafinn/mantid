@@ -37,10 +37,17 @@ public:
   ~Sample();
   Sample &operator=(const Sample &rhs);
 
+  /** @name String representations of geometry flags.*/
+  //@{
+  /// Flag Value 1 = Cylinder
   constexpr static char *CYLINDER{"Cylinder"};
+  /// Flag Value 2 = FlatPlate
   constexpr static char *FLAT_PLATE{"FlatPlate"};
+  /// Flag Value 3 = Disc
   constexpr static char *DISC{"Disc"};
+  /// Flag Value 4 = SingleCrystal
   constexpr static char *SINGLE_CRYSTAL{"SingleCrystal"};
+  //@}
 
   void saveNexus(::NeXus::File *file, const std::string &group) const;
   int loadNexus(::NeXus::File *file, const std::string &group);

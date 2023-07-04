@@ -215,6 +215,12 @@ void Sample::setGeometryFlag(int geom_id) { m_geom_id = geom_id; }
  */
 int Sample::getGeometryFlag() const { return m_geom_id; }
 
+/**
+ * Convert the geometry flag to its associated string name, or the empty string if invalid.
+ * 1 = Cylinder, 2 = FlatPlate, 3 = Disc, 4 = SingleCrystal, else = empty string
+ * @param flag The flag from the sample object.
+ * @return A string containing the meaning of the flag.
+ */
 std::string const Sample::getGeometryStringFromFlag(int const &flag) {
   switch (flag) {
   case 1:
@@ -230,6 +236,12 @@ std::string const Sample::getGeometryStringFromFlag(int const &flag) {
   }
 }
 
+/**
+ * Get the geometry flag associated with a given string, or 0.
+ * Cylinder = 1, FlatPlate = 2, Disc = 3, SingleCrystal = 4, else = 0
+ * @param geometryString The string to turn into a flag (must be in PascalCase)
+ * @return The geometry flag associated with the string.
+ */
 int Sample::getGeometryFlagFromString(std::string const &geometryString) {
   if (geometryString == CYLINDER)
     return 1;
