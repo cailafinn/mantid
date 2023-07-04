@@ -37,6 +37,11 @@ public:
   ~Sample();
   Sample &operator=(const Sample &rhs);
 
+  constexpr static char *CYLINDER{"Cylinder"};
+  constexpr static char *FLAT_PLATE{"FlatPlate"};
+  constexpr static char *DISC{"Disc"};
+  constexpr static char *SINGLE_CRYSTAL{"SingleCrystal"};
+
   void saveNexus(::NeXus::File *file, const std::string &group) const;
   int loadNexus(::NeXus::File *file, const std::string &group);
 
@@ -103,6 +108,10 @@ public:
   void setGeometryFlag(int geom_id);
   /// Returns the geometry flag
   int getGeometryFlag() const;
+  /// Convert a geometry flag to string
+  static std::string const getGeometryStringFromFlag(int const &flag);
+  /// Convert a geometry string to a flag
+  static int getGeometryFlagFromString(std::string const &geometryString);
   /// Sets the thickness
   void setThickness(double thick);
   /// Returns the thickness

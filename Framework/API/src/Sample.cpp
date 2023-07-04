@@ -215,6 +215,33 @@ void Sample::setGeometryFlag(int geom_id) { m_geom_id = geom_id; }
  */
 int Sample::getGeometryFlag() const { return m_geom_id; }
 
+std::string const Sample::getGeometryStringFromFlag(int const &flag) {
+  switch (flag) {
+  case 1:
+    return CYLINDER;
+  case 2:
+    return FLAT_PLATE;
+  case 3:
+    return DISC;
+  case 4:
+    return SINGLE_CRYSTAL;
+  default:
+    return "";
+  }
+}
+
+int Sample::getGeometryFlagFromString(std::string const &geometryString) {
+  if (geometryString == CYLINDER)
+    return 1;
+  if (geometryString == FLAT_PLATE)
+    return 2;
+  if (geometryString == DISC)
+    return 3;
+  if (geometryString == SINGLE_CRYSTAL)
+    return 4;
+  return 0;
+}
+
 /**
  * Set the thickness value
  * @param thick :: The parameter e_thick in the SPB_STRUCT
