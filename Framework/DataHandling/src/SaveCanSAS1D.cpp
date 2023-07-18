@@ -8,6 +8,7 @@
 
 #include "MantidAPI/FileProperty.h"
 #include "MantidAPI/Run.h"
+#include "MantidAPI/Sample.h"
 #include "MantidAPI/WorkspaceUnitValidator.h"
 
 #include "MantidGeometry/IComponent.h"
@@ -100,11 +101,12 @@ void SaveCanSAS1D::init() {
 
   // Collimation information
   std::vector<std::string> collimationGeometry{
-      "Cylinder",
-      "Flat plate",
-      "Disc",
+      Sample::CYLINDER,
+      Sample::FLAT_PLATE,
+      Sample::DISC,
   };
-  declareProperty("Geometry", "Disc", std::make_shared<Kernel::StringListValidator>(collimationGeometry),
+  declareProperty("Geometry", std::string(Sample::DISC),
+                  std::make_shared<Kernel::StringListValidator>(collimationGeometry),
                   "The geometry type of the collimation.");
   auto mustBePositiveOrZero = std::make_shared<Kernel::BoundedValidator<double>>();
   mustBePositiveOrZero->setLower(0);

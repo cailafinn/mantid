@@ -34,20 +34,6 @@ using namespace Mantid::API;
 using namespace Mantid::DataObjects;
 
 namespace {
-int getGeometryID(const std::string &selection) {
-  int geometryID = 0;
-  if (selection == "Cylinder") {
-    geometryID = 1;
-  } else if (selection == "Flat plate") {
-    geometryID = 2;
-  } else if (selection == "Disc") {
-    geometryID = 3;
-  } else {
-    geometryID = 0;
-  }
-  return geometryID;
-}
-
 /** Set a log value on the given run from the given element value, if the
  * element has the given name
  *
@@ -400,7 +386,7 @@ void LoadCanSAS1D::createSampleInformation(const Poco::XML::Element *const sasEn
     auto geometryElement = sasCollimationElement->getChildElement("name");
     if (geometryElement) {
       auto geometry = geometryElement->innerText();
-      auto geometryID = getGeometryID(geometry);
+      auto geometryID = Sample::getGeometryFlagFromString(geometry);
       sample.setGeometryFlag(geometryID);
     }
 
@@ -425,7 +411,7 @@ void LoadCanSAS1D::createSampleInformation(const Poco::XML::Element *const sasEn
       // Get geometry element
       auto geometry = aperture->getAttribute("name");
       if (!geometry.empty()) {
-        auto geometryID = getGeometryID(Poco::XML::fromXMLString(geometry));
+        auto geometryID = Sample::getGeometryFlagFromString(Poco::XML::fromXMLString(geometry));
         sample.setGeometryFlag(geometryID);
       }
 

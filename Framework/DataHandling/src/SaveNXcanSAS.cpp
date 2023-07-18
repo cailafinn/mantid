@@ -12,6 +12,7 @@
 #include "MantidAPI/InstrumentFileFinder.h"
 #include "MantidAPI/Progress.h"
 #include "MantidAPI/Run.h"
+#include "MantidAPI/Sample.h"
 #include "MantidAPI/WorkspaceUnitValidator.h"
 #include "MantidDataHandling/H5Util.h"
 #include "MantidDataHandling/NXcanSASDefinitions.h"
@@ -772,8 +773,8 @@ void SaveNXcanSAS::init() {
                                                   "electron"};
   declareProperty("RadiationSource", "Spallation Neutron Source",
                   std::make_shared<Kernel::StringListValidator>(radiationSourceOptions), "The type of radiation used.");
-  std::vector<std::string> geometryOptions{"Cylinder", "FlatPlate", "Disc"};
-  declareProperty("Geometry", "Disc", std::make_shared<Kernel::StringListValidator>(geometryOptions),
+  std::vector<std::string> const geometryOptions{Sample::CYLINDER, Sample::FLAT_PLATE, Sample::DISC};
+  declareProperty("Geometry", std::string(Sample::DISC), std::make_shared<Kernel::StringListValidator>(geometryOptions),
                   "The geometry type of the collimation.");
   declareProperty("SampleHeight", 0.0,
                   "The height of the collimation element in mm. If specified as 0 it will not be recorded.");
