@@ -40,13 +40,13 @@ public:
   /** @name String representations of geometry flags.*/
   //@{
   /// Flag Value 1 = Cylinder
-  constexpr static char *CYLINDER{"Cylinder"};
+  constexpr static char const *CYLINDER{"Cylinder"};
   /// Flag Value 2 = FlatPlate
-  constexpr static char *FLAT_PLATE{"Flat plate"};
+  constexpr static char const *FLAT_PLATE{"Flat plate"};
   /// Flag Value 3 = Disc
-  constexpr static char *DISC{"Disc"};
+  constexpr static char const *DISC{"Disc"};
   /// Flag Value 4 = SingleCrystal
-  constexpr static char *SINGLE_CRYSTAL{"Single crystal"};
+  constexpr static char const *SINGLE_CRYSTAL{"Single crystal"};
   //@}
 
   void saveNexus(::NeXus::File *file, const std::string &group) const;
