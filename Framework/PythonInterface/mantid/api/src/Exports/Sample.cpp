@@ -31,61 +31,58 @@ GET_POINTER_SPECIALIZATION(Sample)
 void export_Sample() {
   register_ptr_to_python<Sample *>();
   register_ptr_to_python<std::shared_ptr<Sample>>();
+  scope sample =
+      class_<Sample, boost::noncopyable>("Sample")
+          .def("getName", &Sample::getName, return_value_policy<copy_const_reference>(), arg("self"),
+               "Returns the string name of the sample")
+          .def("getOrientedLattice", (const OrientedLattice &(Sample::*)() const) & Sample::getOrientedLattice,
+               arg("self"), return_value_policy<reference_existing_object>(),
+               "Get the oriented lattice for this sample")
+          .def("hasOrientedLattice", &Sample::hasOrientedLattice, arg("self"),
+               "Returns True if this sample has an oriented lattice, false "
+               "otherwise")
+          .def("clearOrientedLattice", &Sample::clearOrientedLattice, arg("self"),
+               "Clears any attached lattice information")
+          .def("getCrystalStructure", &Sample::getCrystalStructure, arg("self"),
+               return_value_policy<reference_existing_object>(), "Get the crystal structure for this sample")
+          .def("hasCrystalStructure", &Sample::hasCrystalStructure, arg("self"),
+               "Returns True if this sample has a crystal structure, false "
+               "otherwise")
+          .def("setCrystalStructure", &Sample::setCrystalStructure, (arg("self"), arg("newCrystalStructure")),
+               "Assign a crystal structure object to the sample.")
+          .def("clearCrystalStructure", &Sample::clearCrystalStructure, arg("self"),
+               "Removes the internally stored crystal structure.")
+          .def("size", &Sample::size, arg("self"), "Return the number of samples contained within this sample")
+          // Required for ISIS SANS reduction until the full sample geometry is
+          // defined on loading
+          .def("getGeometryFlag", &Sample::getGeometryFlag, arg("self"), "Return the geometry flag.")
+          .def("getThickness", &Sample::getThickness, arg("self"), "Return the thickness in mm")
+          .def("getHeight", &Sample::getHeight, arg("self"), "Return the height in mm")
+          .def("getWidth", &Sample::getWidth, arg("self"), "Return the width in mm")
+          .def("getMaterial", &Sample::getMaterial, arg("self"), "The material the sample is composed of",
+               return_value_policy<reference_existing_object>())
+          .def("setGeometryFlag", &Sample::setGeometryFlag, (arg("self"), arg("geom_id")), "Set the geometry flag.")
+          .def("setThickness", &Sample::setThickness, (arg("self"), arg("thick")), "Set the thickness in mm.")
+          .def("setHeight", &Sample::setHeight, (arg("self"), arg("height")), "Set the height in mm.")
+          .def("setWidth", &Sample::setWidth, (arg("self"), arg("width")), "Set the width in mm.")
+          .def("getShape", &Sample::getShape, arg("self"), "Returns a shape of a Sample object.",
+               return_value_policy<reference_existing_object>())
+          .def("setShape", &Sample::setShape, arg("self"), "Set shape of Sample object.")
+          .def("hasEnvironment", &Sample::hasEnvironment, arg("self"),
+               "Returns True if the sample has an environment defined")
+          .def("hasShape", &Sample::hasShape, arg("self"), "Returns True if the sample has a shape defined")
+          .def("getEnvironment", &Sample::getEnvironment, return_value_policy<reference_existing_object>(), arg("self"),
+               "Returns the sample environment")
+          .def("setEnvironment", &Sample::setEnvironment, (arg("self"), arg("env")), "Set the sample environment")
+          // ------------------------- Operators -------------------------------------
+          .def("__len__", &Sample::size, arg("self"), "Gets the number of samples in this collection")
+          .def("__getitem__", &Sample::operator[], (arg("self"), arg("index")), return_internal_reference<>())
+          .def("__copy__", &Mantid::PythonInterface::generic__copy__<Sample>)
+          .def("__deepcopy__", &Mantid::PythonInterface::generic__deepcopy__<Sample>)
+          .def("__eq__", &Sample::operator==, (arg("self"), arg("other")));
 
-  {
-    scope sample =
-        class_<Sample, boost::noncopyable>("Sample")
-            .def("getName", &Sample::getName, return_value_policy<copy_const_reference>(), arg("self"),
-                 "Returns the string name of the sample")
-            .def("getOrientedLattice", (const OrientedLattice &(Sample::*)() const) & Sample::getOrientedLattice,
-                 arg("self"), return_value_policy<reference_existing_object>(),
-                 "Get the oriented lattice for this sample")
-            .def("hasOrientedLattice", &Sample::hasOrientedLattice, arg("self"),
-                 "Returns True if this sample has an oriented lattice, false "
-                 "otherwise")
-            .def("clearOrientedLattice", &Sample::clearOrientedLattice, arg("self"),
-                 "Clears any attached lattice information")
-            .def("getCrystalStructure", &Sample::getCrystalStructure, arg("self"),
-                 return_value_policy<reference_existing_object>(), "Get the crystal structure for this sample")
-            .def("hasCrystalStructure", &Sample::hasCrystalStructure, arg("self"),
-                 "Returns True if this sample has a crystal structure, false "
-                 "otherwise")
-            .def("setCrystalStructure", &Sample::setCrystalStructure, (arg("self"), arg("newCrystalStructure")),
-                 "Assign a crystal structure object to the sample.")
-            .def("clearCrystalStructure", &Sample::clearCrystalStructure, arg("self"),
-                 "Removes the internally stored crystal structure.")
-            .def("size", &Sample::size, arg("self"), "Return the number of samples contained within this sample")
-            // Required for ISIS SANS reduction until the full sample geometry is
-            // defined on loading
-            .def("getGeometryFlag", &Sample::getGeometryFlag, arg("self"), "Return the geometry flag.")
-            .def("getThickness", &Sample::getThickness, arg("self"), "Return the thickness in mm")
-            .def("getHeight", &Sample::getHeight, arg("self"), "Return the height in mm")
-            .def("getWidth", &Sample::getWidth, arg("self"), "Return the width in mm")
-            .def("getMaterial", &Sample::getMaterial, arg("self"), "The material the sample is composed of",
-                 return_value_policy<reference_existing_object>())
-            .def("setGeometryFlag", &Sample::setGeometryFlag, (arg("self"), arg("geom_id")), "Set the geometry flag.")
-            .def("setThickness", &Sample::setThickness, (arg("self"), arg("thick")), "Set the thickness in mm.")
-            .def("setHeight", &Sample::setHeight, (arg("self"), arg("height")), "Set the height in mm.")
-            .def("setWidth", &Sample::setWidth, (arg("self"), arg("width")), "Set the width in mm.")
-            .def("getShape", &Sample::getShape, arg("self"), "Returns a shape of a Sample object.",
-                 return_value_policy<reference_existing_object>())
-            .def("setShape", &Sample::setShape, arg("self"), "Set shape of Sample object.")
-            .def("hasEnvironment", &Sample::hasEnvironment, arg("self"),
-                 "Returns True if the sample has an environment defined")
-            .def("hasShape", &Sample::hasShape, arg("self"), "Returns True if the sample has a shape defined")
-            .def("getEnvironment", &Sample::getEnvironment, return_value_policy<reference_existing_object>(),
-                 arg("self"), "Returns the sample environment")
-            .def("setEnvironment", &Sample::setEnvironment, (arg("self"), arg("env")), "Set the sample environment")
-            // ------------------------- Operators -------------------------------------
-            .def("__len__", &Sample::size, arg("self"), "Gets the number of samples in this collection")
-            .def("__getitem__", &Sample::operator[], (arg("self"), arg("index")), return_internal_reference<>())
-            .def("__copy__", &Mantid::PythonInterface::generic__copy__<Sample>)
-            .def("__deepcopy__", &Mantid::PythonInterface::generic__deepcopy__<Sample>)
-            .def("__eq__", &Sample::operator==, (arg("self"), arg("other")));
-
-    scope().attr("CYLINDER") = Sample::CYLINDER;
-    scope().attr("FLAT_PLATE") = Sample::FLAT_PLATE;
-    scope().attr("DISC") = Sample::DISC;
-    scope().attr("SINGLE_CRYSTAL") = Sample::SINGLE_CRYSTAL;
-  }
+  scope().attr("CYLINDER") = Sample::CYLINDER;
+  scope().attr("FLAT_PLATE") = Sample::FLAT_PLATE;
+  scope().attr("DISC") = Sample::DISC;
+  scope().attr("SINGLE_CRYSTAL") = Sample::SINGLE_CRYSTAL;
 }
