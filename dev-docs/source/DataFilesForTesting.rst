@@ -261,3 +261,22 @@ following gotchas:
    in ``~/.mantid``
 -  Check that you have rebuilt the test executable you're trying to run
 -  Check that you have rebuilt the SystemTestData target
+
+Downloading Single Files
+########################
+
+Sometimes it may be useful to download a single file from the remote store
+to test something without cloning and building the entire testing data.
+
+Visiting the below page and replacing ``<HASH>`` with the hash from one of
+the files in the ``Testing/Data/`` directory in the repo will download the
+file.
+
+
+.. code-block:: html
+
+   https://testdata.mantidproject.org/ftp/external-data/MD5/<HASH>
+
+
+The file will be downloaded with the hash as the filename, so will need to
+be renamed after the download.
