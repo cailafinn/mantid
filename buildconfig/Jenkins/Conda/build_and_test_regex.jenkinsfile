@@ -32,9 +32,9 @@ pipeline {
     }
 
     stages {
-        stage('Debug Runners') {
+        stage('Build and Test') {
             parallel {
-                stage('Debug Runner: Linux') {
+                stage('Build and Test: Linux') {
                     when {
                         beforeAgent true
                         beforeOptions true
@@ -43,10 +43,10 @@ pipeline {
                     agent { label 'linux-64' }
                     options { timestamps () }
                     steps {
-                        debug('linux-64')
+                        build_and_test('linux-64')
                     }
                 }
-                stage('Debug Runner: Windows') {
+                stage('Build and Test: Windows') {
                     when {
                         beforeAgent true
                         beforeOptions true
@@ -55,10 +55,10 @@ pipeline {
                     agent { label 'win-64' }
                     options { timestamps () }
                     steps {
-                        debug('win-64')
+                        build_and_test('win-64')
                     }
                 }
-                stage('Debug Runner: macOS') {
+                stage('Build and Test: macOS') {
                     when {
                         beforeAgent true
                         beforeOptions true
@@ -67,7 +67,7 @@ pipeline {
                     agent { label 'osx-64' }
                     options { timestamps () }
                     steps {
-                        debug('osx-64')
+                        build_and_test('osx-64')
                     }
                 }
             }
@@ -75,6 +75,12 @@ pipeline {
     }
 }
 
-def debug(platform) {
-    echo "Running on ${platform}"
+def build_and_test(platform) {
+    buildscript_path = "${CISCRIPT_DIR}/conda-buildscript"
+    args = " --clean-external-projects"
+    args += " --disable-unittests"
+    args += " --enable-systemtests"
+    args += " --systemtest-regex ${SYSTEM_TEST_REGEX}"
+    cmake_preset = "${platform}-ci"
+    sh "${buildscript_path} ${WORKSPACE}/${CHECKOUT_DIR} ${cmake_preset} ${args}"
 }
