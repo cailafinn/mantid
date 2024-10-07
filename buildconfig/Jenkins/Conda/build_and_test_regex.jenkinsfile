@@ -1,0 +1,80 @@
+// Pipeline file for building and running an arbitrary set of system tests and/or unit tests.
+
+// conda-build can't copy a local source if the conda-bld directory is also part of the source.
+// Checkout to a subdirectory to avoid this.
+CHECKOUT_DIR = 'source'
+CISCRIPT_DIR = "${CHECKOUT_DIR}/buildconfig/Jenkins/Conda"
+
+pipeline {
+    agent none
+    options { checkoutToSubdirectory(CHECKOUT_DIR) }
+    parameters {
+        booleanParam(name: 'TEST_LINUX', defaultValue: false, description: 'If True, the specified tests will run on Linux')
+        booleanParam(name: 'TEST_WINDOWS', defaultValue: false, description: 'If True, the specified tests will run on Windows')
+        booleanParam(name: 'TEST_MACOS', defaultValue: false, description: 'If True, the specified tests will run on MacOS')
+
+        booleanParam(name: 'RUN_UNIT_TESTS', defaultValue: false, description: 'If True, the unit tests will be run')
+        string(name: 'UNIT_TEST_REGEX', defaultValue: '', description: '''Regex-style selection of tests to run. E.g:
+            "SumInQTest|TransformKiKfTest" for two specific tests.
+            "Reflectometry|SANS" to run all tests containing the word "Reflectometry" or "SANS".
+            Using "ctest -R TEST_REGEX" locally is recommended to check your regex before submitting the job.''')
+
+        booleanParam(name: 'RUN_SYSTEM_TESTS', defaultValue: false, description: 'If True, the system tests will be run')
+        string(name: 'SYSTEM_TEST_REGEX', defaultValue: '', description: '''Regex-style selection of tests to run. E.g:
+            "FlipperEfficiencyPolarisedTest|FlipperEfficiencyUnpolarisedTest" for two specific tests.
+            "Flipper|Polarizer" to run all tests containing the word "Flipper" or "Polarizer".
+            Using "./build/systemtest -R TEST_REGEX" locally is recommended to check your regex before submitting the job.''')
+
+        booleanParam(name: 'RUN_DOC_TESTS', defaultValue: false, description: 'If True, run the documentation tests')
+    }
+    environment {
+        WIN_BASH = "C:\\Program Files\\git\\bin\\bash.exe"
+    }
+
+    stages {
+        stage('Debug Runners') {
+            parallel {
+                stage('Debug Runner: Linux') {
+                    when {
+                        beforeAgent true
+                        beforeOptions true
+                        expression { env.TEST_LINUX == 'true' }
+                    }
+                    agent { label 'linux-64' }
+                    options { timestamps () }
+                    steps {
+                        debug('linux-64')
+                    }
+                }
+                stage('Debug Runner: Windows') {
+                    when {
+                        beforeAgent true
+                        beforeOptions true
+                        expression { env.TEST_WINDOWS == 'true' }
+                    }
+                    agent { label 'win-64' }
+                    options { timestamps () }
+                    steps {
+                        debug('win-64')
+                    }
+                }
+                stage('Debug Runner: macOS') {
+                    when {
+                        beforeAgent true
+                        beforeOptions true
+                        expression { env.TEST_MACOS == 'true' }
+                    }
+                    agent { label 'osx-64' }
+                    options { timestamps () }
+                    steps {
+                        debug('osx-64')
+                    }
+                }
+            }
+        }
+    }
+}
+
+def debug(platform) {
+    echo "Running on ${platform}"
+}
