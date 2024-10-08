@@ -29,9 +29,29 @@ pipeline {
     }
     environment {
         WIN_BASH = "C:\\Program Files\\git\\bin\\bash.exe"
+        GIT_COMMITTER_NAME = "${GITHUB_USER_NAME}"
+        GIT_COMMITTER_EMAIL = "${GITHUB_USER_EMAIL}"
     }
 
     stages {
+        stage('Store git commit') {
+          agent { label 'linux-64-regex' }
+          steps {
+            script {
+              env.GIT_SHA = GIT_COMMIT
+            }
+          }
+        }
+        stage('Generate git tag') {
+          agent { label 'linux-64-regex' }
+          steps {
+            checkoutSource("${GIT_SHA}")
+            script {
+              env.GIT_TAG = generate_git_tag()
+            }
+            echo "${env.GIT_TAG}"
+          }
+        }
         stage('Build and Test') {
             parallel {
                 stage('Build and Test: Linux') {
@@ -40,9 +60,10 @@ pipeline {
                         beforeOptions true
                         expression { env.TEST_LINUX == 'true' }
                     }
-                    agent { label 'linux-64' }
+                    agent { label 'linux-64-regex' }
                     options { timestamps () }
                     steps {
+                        checkoutSource("${GIT_SHA}")
                         build_and_test('linux-64')
                     }
                 }
@@ -55,6 +76,7 @@ pipeline {
                     agent { label 'win-64' }
                     options { timestamps () }
                     steps {
+                        checkoutSource("${GIT_SHA}")
                         build_and_test('win-64')
                     }
                 }
@@ -67,6 +89,7 @@ pipeline {
                     agent { label 'osx-64' }
                     options { timestamps () }
                     steps {
+                        checkoutSource("${GIT_SHA}")
                         build_and_test('osx-64')
                     }
                 }
@@ -80,7 +103,36 @@ def build_and_test(platform) {
     args = " --clean-external-projects"
     args += " --disable-unittests"
     args += " --enable-systemtests"
-    args += " --systemtest-regex ${SYSTEM_TEST_REGEX}"
+    args += " --systemtest-regex \"${SYSTEM_TEST_REGEX}\""
+    args += " --clean-build"
     cmake_preset = "${platform}-ci"
     sh "${buildscript_path} ${WORKSPACE}/${CHECKOUT_DIR} ${cmake_preset} ${args}"
+}
+
+def generate_git_tag() {
+    git_tag = ""
+    versionscript_path = "${CISCRIPT_DIR}/generate-version-number"
+    if(isUnix()) {
+        git_tag = sh(script: "${versionscript_path}", returnStdout: true).trim()
+    } else {
+        workspace_unix_style = toUnixStylePath("${WORKSPACE}")
+        // @ suppresses the inclusion of the command itself in the output
+        // https://www.jenkins.io/doc/pipeline/steps/workflow-durable-task-step/#bat-windows-batch-script
+        git_tag = bat(script: "@\"${WIN_BASH}\" -ex -c \"${versionscript_path}\"", returnStdout: true).trim()
+    }
+    return git_tag
+}
+
+def checkoutSource(sha) {
+  dir(CHECKOUT_DIR) {
+    checkout scm: [
+      $class: 'GitSCM',
+      branches: [[name: sha]],
+      extensions: [
+        [$class: 'CheckoutOption', timeout: 20],
+        [$class: 'CleanCheckout', deleteUntrackedNestedRepositories: true],
+        pruneTags(true)
+      ]
+    ]
+  }
 }

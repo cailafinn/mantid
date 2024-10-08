@@ -101,7 +101,10 @@ if [[ $ENABLE_DOCS == true && $ENABLE_DOC_TESTS == true ]]; then
     trap - INT TERM EXIT
 fi
 
+echo $ENABLE_SYSTEM_TESTS
+
 if [[ $ENABLE_SYSTEM_TESTS == true ]]; then
+    echo "DEBUGGING: SYSTESTS"
     rm -fr $userconfig_dir
     rm -f $workbench_ini
 
@@ -118,7 +121,7 @@ if [[ $ENABLE_SYSTEM_TESTS == true ]]; then
     fi
 
     if [[ -n "$SYSTEST_REGEX" ]]; then
-      SYSTEST_REGEX_CMD="-R '$SYSTEST_REGEX'"
+      SYSTEST_REGEX_CMD="-R $SYSTEST_REGEX"
     fi
 
     run_with_xvfb $SYSTEM_TEST_EXECUTABLE $WINDOWS_TEST_OPTIONS $SYSTEM_TEST_OPTIONS $SYSTEST_REGEX_CMD
