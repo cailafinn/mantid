@@ -101,10 +101,21 @@ pipeline {
 def build_and_test(platform) {
     buildscript_path = "${CISCRIPT_DIR}/conda-buildscript"
     args = " --clean-external-projects"
-    args += " --disable-unittests"
-    args += " --enable-systemtests"
-    args += " --systemtest-regex \"${SYSTEM_TEST_REGEX}\""
-    args += " --clean-build"
+    if (!RUN_UNIT_TESTS) {
+        args += " --disable-unittests"
+    }
+    if (UNIT_TEST_REGEX != "") {
+        args += " --unittest-regex \"${UNIT_TEST_REGEX}\""
+    }
+    if (RUN_SYSTEM_TESTS) {
+        args += " --enable-systemtests"
+    }
+    if (SYSTEM_TEST_REGEX != "") {
+        args += " --systemtest-regex \"${SYSTEM_TEST_REGEX}\""
+    }
+    if (RUN_DOC_TESTS) {
+        args += " --enable-doctests"
+    }
     cmake_preset = "${platform}-ci"
     sh "${buildscript_path} ${WORKSPACE}/${CHECKOUT_DIR} ${cmake_preset} ${args}"
 }

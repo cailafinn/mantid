@@ -10,7 +10,10 @@
 #   4. ENABLE_DOCS: Whether or not the docs have been built
 #   5. ENABLE_DOC_TESTS: Whether or not the doc tests should be run
 #   6. BUILD_THREADS: The number of threads to use during testing
-#   7. SYSTEST_REGEX: A regular expression representing the system tests that should be run.
+#
+# Optional args:
+#   --unittest-regex: A regular expression representing the unit tests that should be run.
+#   --systest-regex: A regular expression representing the system tests that should be run.
 
 WORKSPACE=$1
 ENABLE_SYSTEM_TESTS=$2
@@ -18,9 +21,27 @@ ENABLE_UNIT_TESTS=$3
 ENABLE_DOCS=$4
 ENABLE_DOC_TESTS=$5
 BUILD_THREADS=$6
-SYSTEST_REGEX=$7
 
 XVFB_SERVER_NUM=101
+
+while [ ! $# -eq 6 ]
+do
+    case "$7" in
+        --unittest-regex)
+            UNITTEST_REGEX="$8"
+            shift
+            ;;
+        --systemtest-regex)
+            SYSTEST_REGEX="$8"
+            shift
+            ;;
+        *)
+            echo "Argument not accepted: $7"
+            exit 1
+            ;;
+    esac
+    shift
+done
 
 # If this isn't specified for a Jenkins agent, revert to default value
 if [[ -z "$BUILD_THREADS_SYSTEM_TESTS" ]]; then
@@ -87,7 +108,12 @@ cd $WORKSPACE/build
 # mkdir for test logs
 mkdir -p test_logs
 if [[ $ENABLE_UNIT_TESTS == true ]]; then
-    run_with_xvfb ctest -j$BUILD_THREADS --no-compress-output -T Test -O test_logs/ctest_$OSTYPE.log --schedule-random --output-on-failure --repeat until-pass:3 $WINDOWS_TEST_OPTIONS $WINDOWS_UNITTEST_TIMEOUT_OPTIONS
+
+    if [[ -n "$UNITTEST_REGEX" ]]; then
+      UNITTEST_REGEX_CMD="-R $UNITTEST_REGEX"
+    fi
+
+    run_with_xvfb ctest -j$BUILD_THREADS --no-compress-output -T Test -O test_logs/ctest_$OSTYPE.log --schedule-random --output-on-failure --repeat until-pass:3 $WINDOWS_TEST_OPTIONS $WINDOWS_UNITTEST_TIMEOUT_OPTIONS $UNITTEST_REGEX_CMD
 fi
 
 if [[ $ENABLE_DOCS == true && $ENABLE_DOC_TESTS == true ]]; then
@@ -121,8 +147,8 @@ if [[ $ENABLE_SYSTEM_TESTS == true ]]; then
     fi
 
     if [[ -n "$SYSTEST_REGEX" ]]; then
-      SYSTEST_REGEX_CMD="-R $SYSTEST_REGEX"
+        SYSTEM_TEST_OPTIONS+=" -R $SYSTEST_REGEX"
     fi
 
-    run_with_xvfb $SYSTEM_TEST_EXECUTABLE $WINDOWS_TEST_OPTIONS $SYSTEM_TEST_OPTIONS $SYSTEST_REGEX_CMD
+    run_with_xvfb $SYSTEM_TEST_EXECUTABLE $WINDOWS_TEST_OPTIONS $SYSTEM_TEST_OPTIONS
 fi
