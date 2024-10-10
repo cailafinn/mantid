@@ -25,6 +25,7 @@
 #   --clean-external-projects: Clear the external projects from the build folder
 #
 # Possible parameters:
+#   --unittest-regex: A regular expression representing the system tests that should be run.
 #   --systemtest-regex: A regular expression representing the system tests that should be run.
 #   --extra-cmake-flags: Extra flags to pass directly to cmake, enclose in "", defaults to nothing
 #   --build-threads: pass the number of threads that can be used to build with, default is 1 thread per logical core
@@ -91,8 +92,12 @@ do
             BUILD_THREADS="$2"
             shift
             ;;
+        --unittest-regex)
+            UNITTEST_REGEX="--unittest-regex $2"
+            shift
+            ;;
         --systemtest-regex)
-            SYSTEMTEST_REGEX="$2"
+            SYSTEMTEST_REGEX="--systemtest-regex $2"
             shift
             ;;
         *)
@@ -170,7 +175,7 @@ $SCRIPT_DIR/build $WORKSPACE $CMAKE_PRESET $ENABLE_DOCS $ENABLE_DEV_DOCS $ENABLE
 echo "DEBUGGING: TESTS"
 
 # Run unit and system tests
-$SCRIPT_DIR/run-tests $WORKSPACE $ENABLE_SYSTEM_TESTS $ENABLE_UNIT_TESTS $ENABLE_DOCS $ENABLE_DOC_TESTS $BUILD_THREADS $SYSTEMTEST_REGEX
+$SCRIPT_DIR/run-tests $WORKSPACE $ENABLE_SYSTEM_TESTS $ENABLE_UNIT_TESTS $ENABLE_DOCS $ENABLE_DOC_TESTS $BUILD_THREADS $UNITTEST_REGEX $SYSTEMTEST_REGEX
 
 # elapsed time with second resolution
 end_time=$(date +%s)
