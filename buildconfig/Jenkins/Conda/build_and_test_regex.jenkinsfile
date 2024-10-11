@@ -101,29 +101,38 @@ pipeline {
 def build_and_test(platform) {
     buildscript_path = "${CISCRIPT_DIR}/conda-buildscript"
     args = " --clean-external-projects"
-    if (!RUN_UNIT_TESTS) {
+    if (RUN_UNIT_TESTS != "true") {
         args += " --disable-unittests"
+    } else {
+        if (UNIT_TEST_REGEX != "") {
+            args += " --unittest-regex \"${UNIT_TEST_REGEX}\""
+        }
     }
-    if (UNIT_TEST_REGEX != "") {
-        args += " --unittest-regex \"${UNIT_TEST_REGEX}\""
-    }
-    if (RUN_SYSTEM_TESTS) {
+    if (RUN_SYSTEM_TESTS == "true") {
         args += " --enable-systemtests"
+        if (SYSTEM_TEST_REGEX != "") {
+            args += " --systemtest-regex \'${SYSTEM_TEST_REGEX}\'"
+        }
     }
-    if (SYSTEM_TEST_REGEX != "") {
-        args += " --systemtest-regex \"${SYSTEM_TEST_REGEX}\""
-    }
-    if (RUN_DOC_TESTS) {
+    if (RUN_DOC_TESTS == "true") {
         args += " --enable-doctests"
     }
+
     cmake_preset = "${platform}-ci"
-    sh "${buildscript_path} ${WORKSPACE}/${CHECKOUT_DIR} ${cmake_preset} ${args}"
+
+    if (platform.startsWith('win')) {
+        workspace_unix_style = toUnixStylePath("${WORKSPACE}")
+        bat "\"${WIN_BASH}\" -ex -c \"${buildscript_path}\
+          ${workspace_unix_style}/${CHECKOUT_DIR} ${cmake_preset} ${args}\""
+    } else {
+        sh "${buildscript_path} ${WORKSPACE}/${CHECKOUT_DIR} ${cmake_preset} ${args}"
+    }
 }
 
 def generate_git_tag() {
     git_tag = ""
     versionscript_path = "${CISCRIPT_DIR}/generate-version-number"
-    if(isUnix()) {
+    if (isUnix()) {
         git_tag = sh(script: "${versionscript_path}", returnStdout: true).trim()
     } else {
         workspace_unix_style = toUnixStylePath("${WORKSPACE}")
@@ -146,4 +155,11 @@ def checkoutSource(sha) {
       ]
     ]
   }
+}
+
+def toUnixStylePath(path) {
+  if(!path.startsWith("C:")) {
+    path = "C:" + path
+  }
+  return path.replaceAll("\\\\", "/")
 }
