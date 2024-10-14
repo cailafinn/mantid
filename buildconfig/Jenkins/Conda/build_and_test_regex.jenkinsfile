@@ -105,7 +105,7 @@ def build_and_test(platform) {
         args += " --disable-unittests"
     } else {
         if (UNIT_TEST_REGEX != "") {
-            args += " --unittest-regex \"${UNIT_TEST_REGEX}\""
+            args += " --unittest-regex \'${UNIT_TEST_REGEX}\'"
         }
     }
     if (RUN_SYSTEM_TESTS == "true") {

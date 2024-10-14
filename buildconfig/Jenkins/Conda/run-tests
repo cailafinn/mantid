@@ -58,7 +58,7 @@ function run_with_xvfb {
         # Remove Xvfb X server lock files after running
         rm -f /tmp/.X${XVFB_SERVER_NUM}-lock
     else
-        eval $@
+        $@
     fi
 }
 
