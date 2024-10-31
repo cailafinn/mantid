@@ -58,7 +58,7 @@ function run_with_xvfb {
         # Remove Xvfb X server lock files after running
         rm -f /tmp/.X${XVFB_SERVER_NUM}-lock
     else
-        eval $@
+        $@
     fi
 }
 
@@ -150,5 +150,5 @@ if [[ $ENABLE_SYSTEM_TESTS == true ]]; then
         SYSTEM_TEST_OPTIONS+=" -R $SYSTEST_REGEX"
     fi
 
-    run_with_xvfb $SYSTEM_TEST_EXECUTABLE $WINDOWS_TEST_OPTIONS $SYSTEM_TEST_OPTIONS
+    run_with_xvfb \"$SYSTEM_TEST_EXECUTABLE $WINDOWS_TEST_OPTIONS $SYSTEM_TEST_OPTIONS\"
 fi
