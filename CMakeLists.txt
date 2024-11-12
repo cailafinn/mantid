@@ -179,6 +179,7 @@ endif()
 
 if(BUILD_MANTIDFRAMEWORK)
   add_subdirectory(scripts)
+  add_subdirectory(Testing/SystemTests/tests)
 endif()
 
 # Docs requirements
@@ -205,7 +206,6 @@ endif()
 
 # System test targets
 add_subdirectory(Testing/SystemTests/scripts)
-add_subdirectory(Testing/SystemTests/tests)
 
 if(COVERAGE)
   get_property(ALL_SRCS GLOBAL PROPERTY COVERAGE_SRCS)
