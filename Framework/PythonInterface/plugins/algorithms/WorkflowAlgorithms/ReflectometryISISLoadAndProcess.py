@@ -73,7 +73,7 @@ class ReflectometryISISLoadAndProcess(DataProcessorAlgorithm):
 
     def summary(self):
         """Return a summary of the algorithm."""
-        return "Reduce ISIS reflectometry data, including optional loading and summing/slicing of the input runs."
+        return "Reduce ISIS reflectometry data, including optional loading and summing/slicing of the input runs. Tiny Change."
 
     def seeAlso(self):
         """Return a list of related algorithm names."""
