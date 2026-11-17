@@ -59,8 +59,6 @@ public:
    */
   inline double &Y() { return m_pt[1]; }
 
-  inline double NEW() {return 0.1; }
-
   /// Unchecked index access.
   inline const double &operator[](const size_t index) const { return m_pt[index]; }
 
