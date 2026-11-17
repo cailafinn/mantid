@@ -26,144 +26,143 @@ permissions:
   contents: read
 
 jobs:
-  check-filters:
-    runs-on: ubuntu-latest
-    outputs:
-      code_changes: ${{ steps.changes.outputs.code_changes }}
-      doxygen: ${{ steps.changes.outputs.doxygen }}
-      user_docs: ${{ steps.changes.outputs.user_docs }}
-      files_cppcheck: ${{ steps.changes.outputs.files_cppcheck }}
+  # check-filters:
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     code_changes: ${{ steps.changes.outputs.code_changes }}
+  #     doxygen: ${{ steps.changes.outputs.doxygen }}
+  #     user_docs: ${{ steps.changes.outputs.user_docs }}
+  #     files_cppcheck: ${{ steps.changes.outputs.files_cppcheck }}
 
-    steps:
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+  #   steps:
+  #   - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-    - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
-      id: changes
-      with:
-        filters: .github/filters.yaml
+  #   - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+  #     id: changes
+  #     with:
+  #       filters: .github/filters.yaml
 
-  doxygen:
-    needs: [check-filters]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+  # doxygen:
+  #   needs: [check-filters]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: ./.github/actions/setup-pixi
-        if: ${{ needs.check-filters.outputs.doxygen == 'true' }}
+  #     - uses: ./.github/actions/setup-pixi
+  #       if: ${{ needs.check-filters.outputs.doxygen == 'true' }}
 
-      - uses: ./.github/actions/doxygen-build
-        name: Build doxygen
-        if: ${{ needs.check-filters.outputs.doxygen == 'true' }}
+  #     - uses: ./.github/actions/doxygen-build
+  #       name: Build doxygen
+  #       if: ${{ needs.check-filters.outputs.doxygen == 'true' }}
 
-  conda-packaging-linux:
-    needs: [cppcheck, doxygen, check-filters]
-    runs-on:
-      - ${{ (inputs.RUNNER_LABEL == '' && 'self-hosted') || inputs.RUNNER_LABEL }}
-      - self-hosted
-      - Linux
-      - X64
+  # conda-packaging-linux:
+  #   needs: [cppcheck, doxygen, check-filters]
+  #   runs-on:
+  #     - ${{ (inputs.RUNNER_LABEL == '' && 'self-hosted') || inputs.RUNNER_LABEL }}
+  #     - self-hosted
+  #     - Linux
+  #     - X64
 
-    defaults:
-      run:
-        shell: bash
+  #   defaults:
+  #     run:
+  #       shell: bash
 
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 100
-          fetch-tags: true
-          path: source
+  #   steps:
+  #     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+  #       with:
+  #         fetch-depth: 100
+  #         fetch-tags: true
+  #         path: source
 
-      - uses: ./.github/actions/setup-pixi
-        if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
+  #     - uses: ./.github/actions/setup-pixi
+  #       if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
 
-      - name: Clean conda package output directory
-        if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
-        run: |
-          rm -rf ${GITHUB_WORKSPACE}/conda-bld
+  #     - name: Clean conda package output directory
+  #       if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
+  #       run: |
+  #         rm -rf ${GITHUB_WORKSPACE}/conda-bld
 
-      - name: Build mantid and mantidmpi conda packages
-        if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
-        run: |
-          bash -ex ${GITHUB_WORKSPACE}/source/buildconfig/Jenkins/Conda/package-conda ${GITHUB_WORKSPACE} --build-mantid
+  #     - name: Build mantid and mantidmpi conda packages
+  #       if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
+  #       run: |
+  #         bash -ex ${GITHUB_WORKSPACE}/source/buildconfig/Jenkins/Conda/package-conda ${GITHUB_WORKSPACE} --build-mantid
 
-      - name: Build mantidqt conda package
-        if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
-        run: |
-          bash -ex ${GITHUB_WORKSPACE}/source/buildconfig/Jenkins/Conda/package-conda ${GITHUB_WORKSPACE} --build-qt
+  #     - name: Build mantidqt conda package
+  #       if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
+  #       run: |
+  #         bash -ex ${GITHUB_WORKSPACE}/source/buildconfig/Jenkins/Conda/package-conda ${GITHUB_WORKSPACE} --build-qt
 
-      - name: Build mantiddocs conda package
-        if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
-        run: |
-          bash -ex ${GITHUB_WORKSPACE}/source/buildconfig/Jenkins/Conda/package-conda ${GITHUB_WORKSPACE} --build-docs
+  #     - name: Build mantiddocs conda package
+  #       if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
+  #       run: |
+  #         bash -ex ${GITHUB_WORKSPACE}/source/buildconfig/Jenkins/Conda/package-conda ${GITHUB_WORKSPACE} --build-docs
 
-      - name: Build mantidworkbench conda package
-        if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
-        run: |
-          bash -ex ${GITHUB_WORKSPACE}/source/buildconfig/Jenkins/Conda/package-conda ${GITHUB_WORKSPACE} --build-workbench
+  #     - name: Build mantidworkbench conda package
+  #       if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
+  #       run: |
+  #         bash -ex ${GITHUB_WORKSPACE}/source/buildconfig/Jenkins/Conda/package-conda ${GITHUB_WORKSPACE} --build-workbench
 
-      - name: Upload conda packages
-        if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: conda_packages
-          if-no-files-found: error
-          path: ${{ github.workspace }}/conda-bld/**/*.conda
+  #     - name: Upload conda packages
+  #       if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
+  #       uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+  #       with:
+  #         name: conda_packages
+  #         if-no-files-found: error
+  #         path: ${{ github.workspace }}/conda-bld/**/*.conda
 
-      - name: Upload conda environment logs
-        if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: env_logs
-          if-no-files-found: warn
-          path: ${{ github.workspace }}/**/env_logs/*/*.txt
+  #     - name: Upload conda environment logs
+  #       if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
+  #       uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+  #       with:
+  #         name: env_logs
+  #         if-no-files-found: warn
+  #         path: ${{ github.workspace }}/**/env_logs/*/*.txt
 
-  cppcheck:
-    needs: [check-filters]
-    runs-on:
-      - ${{ (inputs.RUNNER_LABEL == '' && 'self-hosted') || inputs.RUNNER_LABEL }}
-      - self-hosted
-      - Linux
-      - X64
+  # cppcheck:
+  #   needs: [check-filters]
+  #   runs-on:
+  #     - ${{ (inputs.RUNNER_LABEL == '' && 'self-hosted') || inputs.RUNNER_LABEL }}
+  #     - self-hosted
+  #     - Linux
+  #     - X64
 
-    defaults:
-      run:
-        shell: bash
+  #   defaults:
+  #     run:
+  #       shell: bash
 
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+  #   steps:
+  #     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Install pixi
-        uses: ./.github/actions/setup-pixi
-        if: ${{ needs.check-filters.outputs.files_cppcheck == 'true' }}
+  #     - name: Install pixi
+  #       uses: ./.github/actions/setup-pixi
+  #       if: ${{ needs.check-filters.outputs.files_cppcheck == 'true' }}
 
-      - name: Clean build tree
-        if: ${{ needs.check-filters.outputs.files_cppcheck == 'true' }}
-        run: ${GITHUB_WORKSPACE}/buildconfig/Jenkins/Conda/clean-builder ${GITHUB_WORKSPACE}
+  #     - name: Clean build tree
+  #       if: ${{ needs.check-filters.outputs.files_cppcheck == 'true' }}
+  #       run: ${GITHUB_WORKSPACE}/buildconfig/Jenkins/Conda/clean-builder ${GITHUB_WORKSPACE}
 
-      - name: Add cppcheck matcher
-        if: ${{ needs.check-filters.outputs.files_cppcheck == 'true' }}
-        run: echo "::add-matcher::.github/matchers/cppcheck.json"
+  #     - name: Add cppcheck matcher
+  #       if: ${{ needs.check-filters.outputs.files_cppcheck == 'true' }}
+  #       run: echo "::add-matcher::.github/matchers/cppcheck.json"
 
-      - uses: ./.github/actions/cppcheck-build
-        if: ${{ needs.check-filters.outputs.files_cppcheck == 'true' }}
-        name: Run cppcheck
+  #     - uses: ./.github/actions/cppcheck-build
+  #       if: ${{ needs.check-filters.outputs.files_cppcheck == 'true' }}
+  #       name: Run cppcheck
 
-      - name: Remove cppcheck matcher
-        if: ${{ always() && needs.check-filters.outputs.files_cppcheck == 'true' }}
-        run: echo "::remove-matcher owner=cppcheck::"
+  #     - name: Remove cppcheck matcher
+  #       if: ${{ always() && needs.check-filters.outputs.files_cppcheck == 'true' }}
+  #       run: echo "::remove-matcher owner=cppcheck::"
 
-      - name: Upload cppcheck SARIF report
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: ${{ always() && needs.check-filters.outputs.files_cppcheck == 'true' && hashFiles('build/cppcheck.sarif') != '' }}
-        with:
-          name: cppcheck_sarif_report
-          if-no-files-found: warn
-          path: ${{ github.workspace }}/build/cppcheck.sarif
+  #     - name: Upload cppcheck SARIF report
+  #       uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+  #       if: ${{ always() && needs.check-filters.outputs.files_cppcheck == 'true' && hashFiles('build/cppcheck.sarif') != '' }}
+  #       with:
+  #         name: cppcheck_sarif_report
+  #         if-no-files-found: warn
+  #         path: ${{ github.workspace }}/build/cppcheck.sarif
 
 
   build-and-test:
-    needs: [cppcheck, doxygen, check-filters]
     permissions:
       contents: read
 
@@ -218,10 +217,8 @@ jobs:
 
       - name: Install pixi
         uses: ./.github/actions/setup-pixi
-        if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
 
       - name: Clean build tree
-        if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
         run: |
           CLEAN_ARGS=""
           if [ "${{ inputs.CLEAN }}" == "true" ]; then
@@ -243,12 +240,10 @@ jobs:
         run: echo "::add-matcher::.github/matchers/msvc.json"
 
       - name: Install pixi environment
-        if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
         run: |
           pixi install --frozen -v
 
       - name: Build code
-        if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
         run: |
           set -o pipefail
           echo "For Jenkins scripts JOB_NAME=${JOB_NAME}"
@@ -259,185 +254,185 @@ jobs:
           pixi run --frozen bash -ex ${GITHUB_WORKSPACE}/buildconfig/Jenkins/Conda/build ${GITHUB_WORKSPACE} $CMAKE_PRESET $ENABLE_DOCS $ENABLE_DEV_DOCS $ENABLE_BUILD_CODE $ENABLE_UNIT_TESTS $ENABLE_SYSTEM_TESTS $ENABLE_DOC_TESTS $EXTRA_CMAKE_FLAGS 2>&1 \
               | tee ${GITHUB_WORKSPACE}/build/test_logs/build_${{ matrix.os }}.log
 
-      - name: Remove GCC Problem Matchers
-        if: ${{ matrix.os == 'Linux' }}
-        run: echo "::remove-matcher owner=gcc-problem-matcher::"
+      # - name: Remove GCC Problem Matchers
+      #   if: ${{ matrix.os == 'Linux' }}
+      #   run: echo "::remove-matcher owner=gcc-problem-matcher::"
 
-      - name: Remove MSVC Problem Matchers
-        if: ${{ matrix.os == 'Windows' }}
-        run: echo "::remove-matcher owner=msvc-problem-matcher::"
+      # - name: Remove MSVC Problem Matchers
+      #   if: ${{ matrix.os == 'Windows' }}
+      #   run: echo "::remove-matcher owner=msvc-problem-matcher::"
 
-      # Runs after the whole build has completed so that every warning is reported at once,
-      # and before the tests so that a warning stops the job from proceeding any further.
-      # The parser understands both the gcc and the MSVC diagnostic formats, so the same
-      # check covers the Linux and the Windows build.
-      # TODO: Needs to be expanded for clang on osx.
-      - uses: ./.github/actions/check-build-warnings
-        name: Check for compiler warnings
-        if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
-        with:
-          log-file: build/test_logs/build_${{ matrix.os }}.log
-          os: ${{ matrix.os }}
+      # # Runs after the whole build has completed so that every warning is reported at once,
+      # # and before the tests so that a warning stops the job from proceeding any further.
+      # # The parser understands both the gcc and the MSVC diagnostic formats, so the same
+      # # check covers the Linux and the Windows build.
+      # # TODO: Needs to be expanded for clang on osx.
+      # - uses: ./.github/actions/check-build-warnings
+      #   name: Check for compiler warnings
+      #   if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
+      #   with:
+      #     log-file: build/test_logs/build_${{ matrix.os }}.log
+      #     os: ${{ matrix.os }}
 
-      - name: Run unit tests
-        if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
-        id: testunit
-        run: |
-          cd ${GITHUB_WORKSPACE}
-          # Not physical but logical cores, includes hyper threaded - different for darwin
-          BUILD_THREADS="$(grep -c ^processor /proc/cpuinfo)"
-          # bool flags for this are
-          # SYSTEM_TESTS UNIT_TESTS DOCS DOC_TESTS
-          pixi run --frozen bash -ex ${GITHUB_WORKSPACE}/buildconfig/Jenkins/Conda/run-tests ${GITHUB_WORKSPACE} false true $ENABLE_DOCS $ENABLE_DOC_TESTS ${BUILD_THREADS}
+      # - name: Run unit tests
+      #   if: ${{ needs.check-filters.outputs.code_changes == 'true' }}
+      #   id: testunit
+      #   run: |
+      #     cd ${GITHUB_WORKSPACE}
+      #     # Not physical but logical cores, includes hyper threaded - different for darwin
+      #     BUILD_THREADS="$(grep -c ^processor /proc/cpuinfo)"
+      #     # bool flags for this are
+      #     # SYSTEM_TESTS UNIT_TESTS DOCS DOC_TESTS
+      #     pixi run --frozen bash -ex ${GITHUB_WORKSPACE}/buildconfig/Jenkins/Conda/run-tests ${GITHUB_WORKSPACE} false true $ENABLE_DOCS $ENABLE_DOC_TESTS ${BUILD_THREADS}
 
-      - name: Archive unit test output (Linux)
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: ${{ matrix.os == 'Linux' && !cancelled() && github.event_name == 'pull_request' && steps.testunit.conclusion != 'skipped' }}
-        with:
-          name: junit-unit-Linux
-          if-no-files-found: ignore
-          path: ${{ github.workspace }}/build/Testing/*unittest.xml
+      # - name: Archive unit test output (Linux)
+      #   uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      #   if: ${{ matrix.os == 'Linux' && !cancelled() && github.event_name == 'pull_request' && steps.testunit.conclusion != 'skipped' }}
+      #   with:
+      #     name: junit-unit-Linux
+      #     if-no-files-found: ignore
+      #     path: ${{ github.workspace }}/build/Testing/*unittest.xml
 
-      - name: Archive unit test output (Windows)
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: ${{ matrix.os == 'Windows' && !cancelled() && github.event_name == 'pull_request' && steps.testunit.conclusion != 'skipped' }}
-        with:
-          name: junit-unit-Windows
-          if-no-files-found: ignore
-          path: ${{ github.workspace }}/build/Testing/*unittest.xml
+      # - name: Archive unit test output (Windows)
+      #   uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      #   if: ${{ matrix.os == 'Windows' && !cancelled() && github.event_name == 'pull_request' && steps.testunit.conclusion != 'skipped' }}
+      #   with:
+      #     name: junit-unit-Windows
+      #     if-no-files-found: ignore
+      #     path: ${{ github.workspace }}/build/Testing/*unittest.xml
 
-      - name: Run system tests
-        if: ${{ matrix.os == 'Linux' && needs.check-filters.outputs.code_changes == 'true' }}
-        id: testsystem
-        run: |
-          cd ${GITHUB_WORKSPACE}
-          # Not physical but logical cores, includes hyper threaded - different for darwin
-          BUILD_THREADS="$(grep -c ^processor /proc/cpuinfo)"
-          # bool flags for this are
-          # SYSTEM_TESTS UNIT_TESTS DOCS DOC_TESTS
-          pixi run --frozen bash -ex ${GITHUB_WORKSPACE}/buildconfig/Jenkins/Conda/run-tests ${GITHUB_WORKSPACE} true false $ENABLE_DOCS $ENABLE_DOC_TESTS ${BUILD_THREADS}
+      # - name: Run system tests
+      #   if: ${{ matrix.os == 'Linux' && needs.check-filters.outputs.code_changes == 'true' }}
+      #   id: testsystem
+      #   run: |
+      #     cd ${GITHUB_WORKSPACE}
+      #     # Not physical but logical cores, includes hyper threaded - different for darwin
+      #     BUILD_THREADS="$(grep -c ^processor /proc/cpuinfo)"
+      #     # bool flags for this are
+      #     # SYSTEM_TESTS UNIT_TESTS DOCS DOC_TESTS
+      #     pixi run --frozen bash -ex ${GITHUB_WORKSPACE}/buildconfig/Jenkins/Conda/run-tests ${GITHUB_WORKSPACE} true false $ENABLE_DOCS $ENABLE_DOC_TESTS ${BUILD_THREADS}
 
-      - name: Upload system test mismatch files
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: ${{ matrix.os == 'Linux' && failure() && steps.testsystem.conclusion == 'failure' }}
-        with:
-          name: system_test_mismatches
-          if-no-files-found: ignore
-          path: ${{ github.workspace }}/build/**/*-mismatch.nxs
+      # - name: Upload system test mismatch files
+      #   uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      #   if: ${{ matrix.os == 'Linux' && failure() && steps.testsystem.conclusion == 'failure' }}
+      #   with:
+      #     name: system_test_mismatches
+      #     if-no-files-found: ignore
+      #     path: ${{ github.workspace }}/build/**/*-mismatch.nxs
 
-      - name: Archive system test output
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: ${{ matrix.os == 'Linux' && !cancelled() && github.event_name == 'pull_request' && steps.testsystem.conclusion != 'skipped' }}
-        with:
-          name: junit-system
-          if-no-files-found: ignore
-          path: ${{ github.workspace }}/build/Testing/SystemTests/**/TEST-systemtests*.xml
+      # - name: Archive system test output
+      #   uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      #   if: ${{ matrix.os == 'Linux' && !cancelled() && github.event_name == 'pull_request' && steps.testsystem.conclusion != 'skipped' }}
+      #   with:
+      #     name: junit-system
+      #     if-no-files-found: ignore
+      #     path: ${{ github.workspace }}/build/Testing/SystemTests/**/TEST-systemtests*.xml
 
-      - name: Upload event payload
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: ${{ matrix.os == 'Linux' && !cancelled() && github.event_name == 'pull_request' }}
-        with:
-          name: event-file
-          path: ${{ github.event_path }}
+      # - name: Upload event payload
+      #   uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      #   if: ${{ matrix.os == 'Linux' && !cancelled() && github.event_name == 'pull_request' }}
+      #   with:
+      #     name: event-file
+      #     path: ${{ github.event_path }}
 
-      - name: Upload build and test log artifacts
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: always()
-        with:
-          name: test_logs_${{ matrix.os }}
-          if-no-files-found: ignore
-          path: ${{ github.workspace }}/build/test_logs/*.log
+      # - name: Upload build and test log artifacts
+      #   uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      #   if: always()
+      #   with:
+      #     name: test_logs_${{ matrix.os }}
+      #     if-no-files-found: ignore
+      #     path: ${{ github.workspace }}/build/test_logs/*.log
 
 
-  user-docs-build-and-test:
-    needs: [cppcheck, doxygen, check-filters]
-    permissions:
-      contents: read
+  # user-docs-build-and-test:
+  #   needs: [cppcheck, doxygen, check-filters]
+  #   permissions:
+  #     contents: read
 
-    runs-on:
-      - ${{ (inputs.RUNNER_LABEL == '' && 'self-hosted') || inputs.RUNNER_LABEL }}
-      - self-hosted
-      - Linux
-      - X64
+  #   runs-on:
+  #     - ${{ (inputs.RUNNER_LABEL == '' && 'self-hosted') || inputs.RUNNER_LABEL }}
+  #     - self-hosted
+  #     - Linux
+  #     - X64
 
-    defaults:
-      run:
-        shell: bash
+  #   defaults:
+  #     run:
+  #       shell: bash
 
-    env:
-      CMAKE_PRESET: linux-64-ci
-      EXTRA_CMAKE_FLAGS: "-DENABLE_PRECOMMIT=OFF"
-      ENABLE_BUILD_CODE: true
-      ENABLE_UNIT_TESTS: false
-      ENABLE_SYSTEM_TESTS: false
-      ENABLE_DOCS: true
-      ENABLE_DOC_TESTS: true
-      # Developer docs are built and published separately by devdocs-publish.yml
-      ENABLE_DEV_DOCS: false
+  #   env:
+  #     CMAKE_PRESET: linux-64-ci
+  #     EXTRA_CMAKE_FLAGS: "-DENABLE_PRECOMMIT=OFF"
+  #     ENABLE_BUILD_CODE: true
+  #     ENABLE_UNIT_TESTS: false
+  #     ENABLE_SYSTEM_TESTS: false
+  #     ENABLE_DOCS: true
+  #     ENABLE_DOC_TESTS: true
+  #     # Developer docs are built and published separately by devdocs-publish.yml
+  #     ENABLE_DEV_DOCS: false
 
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          # Needed to fetch the tags for versioningit
-          fetch-depth: 100
-          fetch-tags: true
+  #   steps:
+  #     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+  #       with:
+  #         # Needed to fetch the tags for versioningit
+  #         fetch-depth: 100
+  #         fetch-tags: true
 
-      - name: Install pixi
-        uses: ./.github/actions/setup-pixi
-        if: ${{ needs.check-filters.outputs.user_docs == 'true' }}
+  #     - name: Install pixi
+  #       uses: ./.github/actions/setup-pixi
+  #       if: ${{ needs.check-filters.outputs.user_docs == 'true' }}
 
-      - name: Clean build tree
-        if: ${{ needs.check-filters.outputs.user_docs == 'true' }}
-        run: |
-          CLEAN_ARGS=""
-          if [ "${{ inputs.CLEAN }}" == "true" ]; then
-            CLEAN_ARGS="--clean-build"
-          fi
-          ${GITHUB_WORKSPACE}/buildconfig/Jenkins/Conda/clean-builder ${GITHUB_WORKSPACE} ${CLEAN_ARGS}
+  #     - name: Clean build tree
+  #       if: ${{ needs.check-filters.outputs.user_docs == 'true' }}
+  #       run: |
+  #         CLEAN_ARGS=""
+  #         if [ "${{ inputs.CLEAN }}" == "true" ]; then
+  #           CLEAN_ARGS="--clean-build"
+  #         fi
+  #         ${GITHUB_WORKSPACE}/buildconfig/Jenkins/Conda/clean-builder ${GITHUB_WORKSPACE} ${CLEAN_ARGS}
 
-      - name: Install pixi environment
-        if: ${{ needs.check-filters.outputs.user_docs == 'true' }}
-        run: |
-          pixi install --frozen -v
+  #     - name: Install pixi environment
+  #       if: ${{ needs.check-filters.outputs.user_docs == 'true' }}
+  #       run: |
+  #         pixi install --frozen -v
 
-      - name: Build code and user docs
-        if: ${{ needs.check-filters.outputs.user_docs == 'true' }}
-        run: |
-          cd ${GITHUB_WORKSPACE}
-          echo "::add-matcher::.github/matchers/gcc.json"
-          pixi run --frozen bash -ex ${GITHUB_WORKSPACE}/buildconfig/Jenkins/Conda/build ${GITHUB_WORKSPACE} $CMAKE_PRESET $ENABLE_DOCS $ENABLE_DEV_DOCS $ENABLE_BUILD_CODE $ENABLE_UNIT_TESTS $ENABLE_SYSTEM_TESTS $ENABLE_DOC_TESTS $EXTRA_CMAKE_FLAGS
-          echo "::remove-matcher owner=gcc-problem-matcher::"
+  #     - name: Build code and user docs
+  #       if: ${{ needs.check-filters.outputs.user_docs == 'true' }}
+  #       run: |
+  #         cd ${GITHUB_WORKSPACE}
+  #         echo "::add-matcher::.github/matchers/gcc.json"
+  #         pixi run --frozen bash -ex ${GITHUB_WORKSPACE}/buildconfig/Jenkins/Conda/build ${GITHUB_WORKSPACE} $CMAKE_PRESET $ENABLE_DOCS $ENABLE_DEV_DOCS $ENABLE_BUILD_CODE $ENABLE_UNIT_TESTS $ENABLE_SYSTEM_TESTS $ENABLE_DOC_TESTS $EXTRA_CMAKE_FLAGS
+  #         echo "::remove-matcher owner=gcc-problem-matcher::"
 
-      - name: Run doctests
-        if: ${{ needs.check-filters.outputs.user_docs == 'true' }}
-        id: testdocs
-        run: |
-          cd ${GITHUB_WORKSPACE}
-          # Not physical but logical cores, includes hyper threaded - different for darwin
-          BUILD_THREADS="$(grep -c ^processor /proc/cpuinfo)"
-          # bool flags for this are
-          # SYSTEM_TESTS UNIT_TESTS DOCS DOC_TESTS
-          pixi run --frozen bash -ex ${GITHUB_WORKSPACE}/buildconfig/Jenkins/Conda/run-tests ${GITHUB_WORKSPACE} false false $ENABLE_DOCS $ENABLE_DOC_TESTS ${BUILD_THREADS}
+  #     - name: Run doctests
+  #       if: ${{ needs.check-filters.outputs.user_docs == 'true' }}
+  #       id: testdocs
+  #       run: |
+  #         cd ${GITHUB_WORKSPACE}
+  #         # Not physical but logical cores, includes hyper threaded - different for darwin
+  #         BUILD_THREADS="$(grep -c ^processor /proc/cpuinfo)"
+  #         # bool flags for this are
+  #         # SYSTEM_TESTS UNIT_TESTS DOCS DOC_TESTS
+  #         pixi run --frozen bash -ex ${GITHUB_WORKSPACE}/buildconfig/Jenkins/Conda/run-tests ${GITHUB_WORKSPACE} false false $ENABLE_DOCS $ENABLE_DOC_TESTS ${BUILD_THREADS}
 
-      - name: Upload doctest results
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: ${{ !cancelled() && github.event_name == 'pull_request' && steps.testdocs.conclusion != 'skipped' }}
-        with:
-          name: junit-doctest
-          if-no-files-found: ignore
-          path: ${{ github.workspace }}/build/docs/doctest/TEST-doctest.xml
+  #     - name: Upload doctest results
+  #       uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+  #       if: ${{ !cancelled() && github.event_name == 'pull_request' && steps.testdocs.conclusion != 'skipped' }}
+  #       with:
+  #         name: junit-doctest
+  #         if-no-files-found: ignore
+  #         path: ${{ github.workspace }}/build/docs/doctest/TEST-doctest.xml
 
-      - name: Upload event payload
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
-        with:
-          name: event-file-doctest
-          path: ${{ github.event_path }}
+  #     - name: Upload event payload
+  #       uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+  #       if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+  #       with:
+  #         name: event-file-doctest
+  #         path: ${{ github.event_path }}
 
-      - name: Upload build and test log artifacts
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: always()
-        with:
-          name: user_docs_test_logs_Linux
-          if-no-files-found: ignore
-          path: ${{ github.workspace }}/build/test_logs/*.log
+  #     - name: Upload build and test log artifacts
+  #       uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+  #       if: always()
+  #       with:
+  #         name: user_docs_test_logs_Linux
+  #         if-no-files-found: ignore
+  #         path: ${{ github.workspace }}/build/test_logs/*.log
